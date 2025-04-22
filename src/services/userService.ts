@@ -1,21 +1,76 @@
 import { PrismaClient } from '@prisma/client';
+import { MESSAGES } from '@constant';
+import { created, success, notFound, conflict, noContent } from '@statusCode';
 
 const prisma = new PrismaClient();
 
-// List all users
-export const findAll = async () => {
-    return await prisma.user.findMany();
+const findAll = async () => {
+    const users: any = await prisma.user.findMany();
+
+    if (!users) {
+        return { ...notFound, message: MESSAGES.USER_NOT_FOUND };
+    }
+
+    return { ...success, data: users };
 };
 
-// Create a new user
-export const create = async (body: any) => {
+const create = async (body: any) => {
     const { email, name } = body;
-    return await prisma.user.create({
+    const query = { where: { email }};
+
+    let user = await prisma.user.findUnique(query);
+    if (user) {
+        return { ...conflict, message: MESSAGES.USER_ALREADY_CREATED };
+    }
+
+    user = await prisma.user.create({
         data: {
             email,
             name,
         },
     });
+
+    return { ...created, data: user };
 };
 
-export default { create, findAll };
+const findById = async (id: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id: parseInt(id) }
+    });
+    if (!user) {
+        return { ...notFound, message: MESSAGES.USER_NOT_FOUND };
+    }
+
+    return { ...success, data: user };
+};
+
+const updateById = async (id: string, data: any) => {
+    const query = { where: { id: parseInt(id)}};
+
+    let user = await prisma.user.findUnique(query);
+    if (!user) {
+        return { ...notFound, message: MESSAGES.USER_NOT_FOUND };
+    }
+
+    user = await prisma.user.update({
+        where: {
+            id:  parseInt(id),
+        },
+        data
+    });
+
+    return { ...success, data: user };
+};
+
+const deleteById = async (id: string) => {
+    const query = { where: {id : parseInt(id) }};
+    const user = await prisma.user.findUnique(query);
+    if (!user) {
+        return { ...notFound, message: MESSAGES.USER_NOT_FOUND };
+    }
+
+    await prisma.user.delete(query);
+    return { ...noContent };
+};
+
+export default { create, findAll, findById, updateById, deleteById };

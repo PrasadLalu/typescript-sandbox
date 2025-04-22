@@ -13,7 +13,18 @@
         "strictPropertyInitialization": true,
         "baseUrl": "./",
         "paths": {
-          "@logger": ["src/utils/logger.ts"]
+            "@utils": [
+                "src/utils/*"
+            ],
+            "@logger": [
+                "src/utils/logger.ts"
+            ],
+            "@constant": [
+                "src/utils/constant.ts"
+            ],
+            "@statusCode": [
+                "src/utils/statusCode.ts"
+            ],
         },
     },
     "include": [
