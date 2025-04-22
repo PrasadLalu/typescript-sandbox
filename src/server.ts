@@ -1,7 +1,9 @@
+import 'module-alias/register';
 import http from 'http';
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 import express, { Express } from 'express';
 import apiRoutes from './routes';
+import logger from '@logger';
 
 // Load env vars
 dotenv.config();
@@ -22,5 +24,5 @@ app.use('/api/v1', apiRoutes);
 // Create server and listen to server
 const server = http.createServer(app);
 server.listen(PORT, () => {
-    console.log(`Server running on port: ${PORT}`);
+    logger.info(`Server running on port: ${PORT}`);
 });
